@@ -4,19 +4,50 @@
     <meta charset="utf-8"/>
     <title>US Map data</title>
     <style>
-      .land {
-         fill: #222;
-      }
 
       .state-boundry {
         fill:none;
         stroke: #FFF;
       }
+
+      .state {
+        fill:blue;
+      }
+
+      .state.active {
+         stroke: 3px black;
+      }
+
+      #infoCtr {
+         position: absolute;
+         top: 0;
+         left: 0;
+      }
+
+      #info{
+         background-color: #EED;
+         border: 1px solid #999;
+         box-shadow: 4px 4px 5px black;
+         opacity: 0;
+         padding: 10px;
+      }
+
+      #info h3 {
+         margin: 0 0 4px 0;
+      }
+
+      #info .dataBlock .name {
+        font-weight: bold;
+        margin-right: 4px;
+      }
+         
    </style>
   </head>
   <body>
+    <div id="infoCtr"><div id="info"></div></div>
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="http://d3js.org/topojson.v1.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
     <script src="usMap.js"></script>
   </body>
 </html5>
