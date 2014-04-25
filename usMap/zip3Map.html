@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html5>
+  <head>
+    <meta charset="utf-8"/>
+    <title>US Map Zip3 data</title>
+    <style>
+
+      .zip-boundry {
+        fill:none;
+        stroke: #FFF;
+      }
+
+      .zip {
+        fill:blue;
+      }
+
+      .zip.active {
+         stroke: 3px black;
+      }
+
+      #infoCtr {
+         position: absolute;
+         top: 0;
+         left: 0;
+      }
+
+      #info{
+         background-color: #EED;
+         border: 1px solid #999;
+         box-shadow: 4px 4px 5px black;
+         opacity: 0;
+         padding: 10px;
+      }
+
+      #info h3 {
+         margin: 0 0 4px 0;
+      }
+
+      #info .dataBlock .name {
+        font-weight: bold;
+        margin-right: 4px;
+      }
+         
+   </style>
+  </head>
+  <body>
+    <div id="infoCtr"><div id="info"></div></div>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+    <script src="zip3Map.js"></script>
+  </body>
+</html5>
