@@ -17,7 +17,7 @@ var colorScale = d3.scale.linear()
     .range(["blue", "red"]);
 
 
-var allZips, zipCount;
+var allZips;
 function easeBigBounce(t){
     if (t <= 0) return 0;
     if (t >= 1) return 1;
@@ -33,20 +33,21 @@ function nextZip(){
 function startRandom(){
     setInterval(function(){
 	var s = nextZip();
-	var count = zipCount[s];
-	count += 1;
-	zipCount[s] = count;
-	d3.select("#zip-" + s)
+	var zip = d3.select("#zip-" + s);
+	var datum = zip.datum();
+	datum.properties.count += 1;
+
+	zip.datum(datum)
 	   .transition()
 	   .duration(800)
 	   .ease(easeBigBounce)
-	   .style("fill", colorScale(count));
+	   .style("fill", function(d){return colorScale(d.properties.count);});
     }, 50);
 }
 
 function updateInfo(d){
     infoDiv = d3.select("#info");
-    infoDiv.html("<h3>" + d.properties.zip3 + '</h3><div class="dataBlock"><span class="name">Count:</span><span class="data">' + zipCount[d.properties.zip3] + '</span></div>')
+    infoDiv.html("<h3>" + d.properties.zip3 + '</h3><div class="dataBlock"><span class="name">Count:</span><span class="data">' + d.properties.count + '</span></div>')
 }
 
 function mouseMove(){
@@ -74,8 +75,12 @@ function mouseMove(){
 
 function loadZips(error, us){
     var zips = topojson.feature(us, us.objects.zip3);
+    //Add in count to each zip
+    zips.features.forEach(function(d) {d.properties.count = 0;});
     allZips = zips.features.map(function(d){return d.properties.zip3;});
+    /*
     zipCount = allZips.reduce(function(m, z){m[z] = 0; return m;}, {});
+    */
 
     svg.on("mousemove", mouseMove);
 
@@ -93,9 +98,27 @@ function loadZips(error, us){
 
 };
 
+function initPage(){
+    d3.select("#randomStart")
+       .property("disabled", true);
+}
+
+function loadDone(){
+    d3.select("#randomStart")
+       .property("disabled", false)
+       .on("click", function(){ startRandom();});
+}
+	   
+
 queue()
    .defer(d3.json, "zip3-simp.json")
-   .await(function(){loadZips.apply(null, arguments); startRandom()});
+   .await(function(){loadZips.apply(null, arguments); loadDone()});
+
+var socket = io.connect("http://devstack.sfdc-matrix.net:3020/viewOutput");
+socket.on('topicMessage', function(data){
+    console.log(evt);
+});
+
 
 
 //d3.select(self.frameElement).style("height", height + "px");
