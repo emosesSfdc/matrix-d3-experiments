@@ -12,6 +12,16 @@ var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
+var g = svg.append("g");
+
+var zoom = d3.behavior.zoom()
+    .translate([0,0])
+    .scale(1)
+    .scaleExtent([1,8])
+    .on("zoom", zoomed);
+
+svg.call(zoom).call(zoom.event);
+
 var colorScale = d3.scale.linear()
     .domain([0, 100])
     .range(["blue", "red"]);
@@ -82,21 +92,26 @@ function loadZips(error, us){
     zipCount = allZips.reduce(function(m, z){m[z] = 0; return m;}, {});
     */
 
-    svg.on("mousemove", mouseMove);
+    g.on("mousemove", mouseMove);
 
-    svg.selectAll("path")
+    g.selectAll("path")
      .data(zips.features)
      .enter().append("path")
        .attr("class", "zip")
        .attr("d", path)
        .attr("id", function(d) {return "zip-" + d.properties.zip3;});
 
-    svg.insert("path", ".graticule")
+    g.insert("path", ".graticule")
        .datum(topojson.mesh(us, us.objects.zip3, function(a, b) {return a !== b; }))
        .attr("class", "zip-boundry")
        .attr("d", path);
 
 };
+
+function zoomed(){
+    g.style("stroke-width", 1.5 / d3.event.scale + "px");
+    g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+}
 
 function initPage(){
     d3.select("#randomStart")
