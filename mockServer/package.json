@@ -1,0 +1,11 @@
+{
+    "name": "MockStreamingData",
+    "version": "0.0.1",
+    "description": "Stream sample JSON data over socket.io",
+    "dependencies": {
+	"socket.io": "latest"
+    },
+    "author": "emoses"
+}
+    
+    

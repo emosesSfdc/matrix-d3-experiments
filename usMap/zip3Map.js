@@ -44,17 +44,24 @@ function nextRegion(){
     return allRegions[index];
 }
 
+function hitRegion(regionName, count){
+    var region = d3.select("#region-" + regionName);
+
+    var datum = region.datum();
+    if (typeof(count) != "number"){
+	count = datum.properties.count +1;
+    }
+    datum.properties.count = count;
+    datum.properties.heat += HEAT_JUMP;
+    region.datum(datum);
+
+    updateRegion(region, "heat");
+}
+
 function startRandom(){
     setInterval(function(){
 	var s = nextRegion();
-	var region = d3.select("#region-" + s);
-
-	var datum = region.datum();
-	datum.properties.count += 1;
-	datum.properties.heat += HEAT_JUMP;
-	region.datum(datum);
-
-	updateRegion(region, "heat");
+	hitRegion(s);
     }, 50);
 }
 
@@ -184,18 +191,22 @@ function loadDone(){
        .on("click", function(){ startRandom();});
 
     setInterval(decayAndUpdate, DECAY_INTERVAL);
+    connectToServer();
 }
 	   
+function connectToServer(){
+    var hostString = window.location.protocol + "//" + window.location.hostname + ":9002";
+    var socket = io.connect(hostString);
+    socket.on('topicMessage', function(data){
+	hitRegion(data.zip3, data.count);
+	
+    });
+}
 
 queue()
    .defer(d3.json, "zip3-simp.json")
    .await(function(){loadRegions.apply(null, arguments); loadDone()});
 
-var socket = io.connect("http://devstack.sfdc-matrix.net:3020/viewOutput");
-socket.on('topicMessage', function(data){
-    console.log(evt);
-});
 
 
 
-//d3.select(self.frameElement).style("height", height + "px");
