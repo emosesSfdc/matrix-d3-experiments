@@ -29,6 +29,7 @@ var colorScale = d3.scale.log()
 var DECAY_INTERVAL = 100;
 var HEAT_JUMP = 20;
 var HEAT_DECAY = 1;
+var MIN_FONT_SIZE = 6;
 
 var allRegions;
 function easeBigBounce(t){
@@ -118,7 +119,7 @@ function mouseMove(){
 }
 
 function regionText(d){
-    return d.properties.zip3 + ": " + d.properties.count; 
+    return d.properties.count; 
 }
 
 
@@ -148,7 +149,8 @@ function loadRegions(error, us){
 					var width = bounds[1][0] - bounds[0][0];
 					return (width / 6.0) + "px" })
        .attr("text-anchor", "middle")
-       .attr("dy", ".35em");
+       .attr("dy", ".35em")
+       .each(function(){hideTextIfTooSmall.call(this, 1)});
 
     g.insert("path", ".graticule")
        .datum(topojson.mesh(us, us.objects.zip3, function(a, b) {return a !== b; }))
@@ -156,9 +158,19 @@ function loadRegions(error, us){
        .attr("d", path);
 };
 
+//For use with in an each with all text nodes
+function hideTextIfTooSmall(scale){
+    var text = d3.select(this);
+    if (parseInt(window.getComputedStyle(this).fontSize) * scale < MIN_FONT_SIZE){
+	text.style("visibility", "hidden");
+    } else {
+	text.style("visibility", "visible");
+    }
+}
+
 function zoomed(){
-    g.style("stroke-width", 1.5 / d3.event.scale + "px");
     g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    g.selectAll("text").each(function() {hideTextIfTooSmall.call(this, d3.event.scale);});
 }
 
 function initPage(){
