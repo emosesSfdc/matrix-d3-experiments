@@ -22,10 +22,13 @@ var zoom = d3.behavior.zoom()
 
 svg.call(zoom).call(zoom.event);
 
-var colorScale = d3.scale.linear()
-    .domain([0, 100])
+var colorScale = d3.scale.log()
+    .domain([1, 100])
     .range(["blue", "red"]);
 
+var DECAY_INTERVAL = 100;
+var HEAT_JUMP = 20;
+var HEAT_DECAY = 1;
 
 var allRegions;
 function easeBigBounce(t){
@@ -47,18 +50,31 @@ function startRandom(){
 
 	var datum = region.datum();
 	datum.properties.count += 1;
+	datum.properties.heat += HEAT_JUMP;
 	region.datum(datum);
 
-	updateRegion(region, "count");
+	updateRegion(region, "heat");
     }, 50);
+}
+
+function decayAndUpdate(){
+    d3.selectAll(".regionG path")
+      .each(function(d){
+	  if (d.properties.heat > 1){
+	      d.properties.heat = Math.max(d.properties.heat - HEAT_DECAY, 1);
+	      d3.select(this)
+		  .transition()
+	          .duration(DECAY_INTERVAL - 10)
+		  .style("fill", colorScale(d.properties.heat));
+	  }
+	});
 }
 
 function updateRegion(region, property){
     region.select("path")
-       .transition()
-       .duration(800)
-       .ease(easeBigBounce)
-       .style("fill", function(d){return colorScale(d.properties[property]);});
+	.transition()
+        .duration(400)
+        .style("fill", function(d){ return colorScale(d.properties.heat);});
 
     region.select("text").text(regionText);
 }
@@ -109,13 +125,10 @@ function regionText(d){
 function loadRegions(error, us){
     var regions = topojson.feature(us, us.objects.zip3);
     //Add in count to each region
-    regions.features.forEach(function(d) {d.properties.count = 0;});
+    regions.features.forEach(function(d) {d.properties.count = 0; d.properties.heat = 0;});
     allRegions = regions.features.map(function(d){return d.properties.zip3;});
-    /*
-    regionCount = allRegions.reduce(function(m, z){m[z] = 0; return m;}, {});
-    */
 
-    g.on("mousemove", mouseMove);
+    d3.select(document.body).on("mousemove", mouseMove);
 
     var regions = g.selectAll("path")
      .data(regions.features)
@@ -157,6 +170,8 @@ function loadDone(){
     d3.select("#randomStart")
        .property("disabled", false)
        .on("click", function(){ startRandom();});
+
+    setInterval(decayAndUpdate, DECAY_INTERVAL);
 }
 	   
 
