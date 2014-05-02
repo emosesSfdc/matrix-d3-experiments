@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>US Map Zip3 data</title>
+    <link href="nv.d3.css" rel="stylesheet" type="text/css"/>
+    <style>
+
+      body {
+         background-color: #222;
+      }
+
+      .region-boundry {
+        fill:none;
+        stroke: #DDD;
+        stroke-width: 0.5px;
+      }
+
+      .region {
+        fill:blue;
+      }
+
+      .region.active {
+         stroke: 3px black;
+      }
+
+      #infoCtr {
+         position: absolute;
+         top: 0;
+         left: 0;
+      }
+
+      #info{
+         background-color: #EED;
+         border: 1px solid #999;
+         box-shadow: 4px 4px 5px black;
+         opacity: 0;
+         padding: 10px;
+      }
+
+      #info h3 {
+         margin: 0 0 4px 0;
+      }
+
+      #info .dataBlock .name {
+        font-weight: bold;
+        margin-right: 4px;
+      }
+
+      text {
+         fill: white;
+         stroke: black;
+         stroke-width: .02em;
+      }
+         
+   </style>
+  </head>
+  <body>
+    <div id="infoCtr"><div id="info"></div></div>
+    <div id="chart"></div>
+    <button id="randomStart" name="randomStart">Generate random data</button>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+    <script src="nv.d3.js"></script>
+    <script src="socket.io.js"></script>
+    <script src="rtHistogram.js"></script>
+  </body>
+</html>
