@@ -29,11 +29,16 @@ function randomData() {
 }
 
 function startRandom() {
+    var cnt = 0;
     setInterval(function(){
 	var s = randomData();
 	histData[0].values[s].count += 1; 
-	chart.update();
-    }, 100);
+	cnt += 1;
+	if (cnt == 10){
+	    chart.update();
+	    cnt = 0;
+	}
+    }, 1);
 }
 
 function onLoad(){
